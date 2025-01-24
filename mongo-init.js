@@ -1,4 +1,4 @@
-db.auth('root', 'example')
+db.auth('root', 'senha')
 
 exemploimagem = db.getSiblingDB('exemploimagem')
 
@@ -6,7 +6,7 @@ exemplimagem.createCollection('base')
 
 exemploimagem.createUser({
   user: 'root',
-  pwd: 'example',
+  pwd: 'senha',
   roles: [
     {
       role: 'root',
@@ -21,7 +21,7 @@ eventosgrupo1.createCollection('base')
 
 eventosgrupo1.createUser({
   user: 'root',
-  pwd: 'example',
+  pwd: 'senha',
   roles: [
     {
       role: 'root',
@@ -36,7 +36,7 @@ eventosgrupo2.createCollection('base')
 
 eventosgrupo2.createUser({
   user: 'root',
-  pwd: 'example',
+  pwd: 'senha',
   roles: [
     {
       role: 'root',
@@ -51,7 +51,7 @@ eventosgrupo3.createCollection('base')
 
 eventosgrupo3.createUser({
   user: 'root',
-  pwd: 'example',
+  pwd: 'senha',
   roles: [
     {
       role: 'root',
@@ -66,7 +66,7 @@ eventosgrupo4.createCollection('base')
 
 eventosgrupo4.createUser({
   user: 'root',
-  pwd: 'example',
+  pwd: 'senha',
   roles: [
     {
       role: 'root',
@@ -81,7 +81,7 @@ eventosgrupo5.createCollection('base')
 
 eventosgrupo5.createUser({
   user: 'root',
-  pwd: 'example',
+  pwd: 'senha',
   roles: [
     {
       role: 'root',

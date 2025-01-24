@@ -18,16 +18,34 @@ var multer = require('multer');
 
 var storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads')
+        cb(null, 'uploads');
     },
     filename: (req, file, cb) => {
-        cb(null, file.fieldname + '-' + Date.now())
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
     }
 });
 
-var upload = multer({ storage: storage });
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 100000000 }, // 100MB file size limit
+    fileFilter: function(req, file, cb) {
+        checkFileType(file, cb);
+    }
+}).single('image');
 
-app.get('/', (req, res) => {
+function checkFileType(file, cb) {
+    const filetypes = /jpeg|jpg|png|gif/;
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = filetypes.test(file.mimetype);
+  
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb('Error: Images only! (jpeg, jpg, png, gif)');
+    }
+  }
+
+  app.get('/', (req, res) => {
     imgSchema.find({})
     .then((data, err)=>{
         if(err){
@@ -65,8 +83,21 @@ app.get('/teste', (req, res) => {
     })
 });
 
-app.post('/', upload.single('image'), (req, res, next) => {
+app.post('/', (req, res) => {
+    upload(req, res, (err) => { 
+        if (err) {
+            res.send(err);
+        }
+        else {
+            salvaArquivo(req,res);
+        }
+    })
 
+    
+});
+
+
+function salvaArquivo(req,res) {
     var obj = {
         name: req.body.name,
         desc: req.body.desc,
@@ -76,16 +107,13 @@ app.post('/', upload.single('image'), (req, res, next) => {
         }
     }
     imgSchema.create(obj)
-    .then ((err, item) => {
-        if (err) {
-            console.log(err);
-        }
-        else {
-            //item.save();
-            res.redirect('http://localhost:8000/');
-        }
+    .then ((result) => {
+        res.redirect('http://localhost:8000/')
+    }).catch((err) => {{
+
+        res.send(err)}
     });
-});
+}
 
 var port = process.env.PORT || '3000'
 app.listen(port, err => {

@@ -4,7 +4,7 @@ services:
   mongo:
     image: mongo
     restart: always
-    container_name: mongo-container
+    container_name: mongo
     ports:
       - "27017:27017"
     volumes:
@@ -22,7 +22,11 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: senha
       ME_CONFIG_MONGODB_URL: mongodb://root:senha@mongo:27017/
-      ME_CONFIG_BASICAUTH_ENABLED: false      
+      ME_CONFIG_BASICAUTH_ENABLED: false
+      ME_CONFIG_BASICAUTH_USERNAME:  root
+      ME_CONFIG_BASICAUTH_PASSWORD:  senha
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+      ME_CONFIG_MONGODB_SERVER: mongo
 
   exemplo-1-service:
     build: ./web/exemplo
@@ -77,6 +81,7 @@ services:
       - "3000:3000"
     volumes:
       - ./api/exemplo:/app
+      - ./api/exemplo/mongodata:/data/db
       - ./api/exemplo/uploads:/app/uploads
     env_file:
       - ./.env.exemplo
