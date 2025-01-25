@@ -45,8 +45,29 @@ async def trata_image(
     image_file: UploadFile = File(...)):
     image = Image.open(image_file.file)
     image = image.resize((224, 224))
-    inp = np.array(image)
-    inp = inp.reshape((-1, 224, 224, 3))
+    mimetype = image_file.content_type
+    if mimetype == "image/png":
+        image.load()
+        background = Image.new("RGB", image.size, (255, 255, 255))
+        try: 
+            background.paste(image, mask=image.split()[3])
+        except:
+            aux = image.convert("RGBA")
+            alpha = aux.split()[-1]
+            background.paste(image, mask=alpha)            
+        image = background
+        print("Imagem png")
+    elif mimetype == "image/jpeg":
+#        image = image.convert("RGB")
+        print("Imagem jpeg")
+    else:
+        return JSONResponse(
+            content={"error": "Formato de imagem não suportado"}
+        )
+    
+#    inp = np.array(image)
+    inp = np.asarray(image, dtype=np.float32).reshape(-1,224,224,3)
+#    inp = inp.reshape((-1, 224, 224, 3))
     inp = tf.keras.applications.mobilenet_v2.preprocess_input(inp)
     prediction = inception_net.predict(inp).flatten()
     confidences = {labels[i]: float(prediction[i]) for i in range(1000)}
