@@ -7,7 +7,7 @@ Atenção:
 - Não serão considerados trabalhos iguais e, caso ocorram duas entregas iguais a que tiver as datas de commit anteriores será a única considerada;
 - Você deve descrever a funcionalidade que será implementada e qual a sua utilidade no contexto do projeto;
 - O seu README deve conter as instruções para executar o projeto e acessar a(s) funcionalidade(s) prevista(s);
-- REFORÇANDO: as entregas serão com a postagem da url do fork no github. Não serão aceitos arquivos, zips, links para implementações.
+- REFORÇANDO: as entregas serão com a postagem da url do fork no github. Não serão aceitos arquivos, zips, links para implementações ou novos repositórios que não sejam fork desse repositório.
 - No caso de não ocorrer a entrega ou de ela não estar de acordo com a proposta, será necessário efetuar a matrícula na disciplina de IA e cursá-la INTEGRALMENTE e PRESENCIALMENTE, para conclusão do curso com a turma de 2025.
 
 # Contextualização:
