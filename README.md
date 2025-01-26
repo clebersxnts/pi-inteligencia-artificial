@@ -1,6 +1,6 @@
 # IMPORTANTE: SOBRE A ENTREGA
 
-A entrega deverá ser realizada com a postagem da url do seu fork do repositório. No formulário que será disponibilizado, você deverá informar a url do seu fork do projeto.
+A entrega deverá ser realizada com a postagem da url do seu fork do repositório. No formulário que será disponibilizado, você deverá informar apenas a url do seu fork do projeto.
 
 Atenção:
 - As entregas serão individuais: cada aluno deverá informar seu fork.
