@@ -1,5 +1,16 @@
-# Contextualização:
+# IMPORTANTE: SOBRE A ENTREGA
 
+A entrega deverá ser realizada com a postagem da url do seu fork do repositório. No formulário que será disponibilizado, você deverá informar a url do seu fork do projeto.
+
+Atenção:
+- As entregas serão individuais: cada aluno deverá informar seu fork.
+- Não serão considerados trabalhos iguais e, caso ocorram duas entregas iguais a que tiver as datas de commit anteriores será a única considerada;
+- Você deve descrever a funcionalidade que será implementada e qual a sua utilidade no contexto do projeto;
+- O seu README deve conter as instruções para executar o projeto e acessar a(s) funcionalidade(s) prevista(s);
+- REFORÇANDO: as entregas serão com a postagem da url do fork no github. Não serão aceitos arquivos, zips, links para implementações.
+- No caso de não ocorrer a entrega ou de ela não estar de acordo com a proposta, será necessário efetuar a matrícula na disciplina de IA e cursá-la INTEGRALMENTE e PRESENCIALMENTE, para conclusão do curso com a turma de 2025.
+
+# Contextualização:
 
 Os projetos foram convertidos para containers dockers. Há um container para cada servidor web e para cada api. Para isso, foram isolados os ambientes api e web que se encontram em duas pastas no repositório. Dentro delas, há uma pasta grupo-x para cada grupo. 
 
