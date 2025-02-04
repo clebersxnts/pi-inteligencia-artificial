@@ -7,9 +7,9 @@ app = Flask(__name__)
 
 # Configuração do pipeline do Stable Diffusion
 pipeline = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16)
-pipeline = pipeline.to("cuda")  # Configuração para GPU
+pipeline = pipeline.to("cuda")  # Se sua máquina suporta GPU
 
-# Diretório para salvar imagens geradas
+# Caminho para salvar as imagens geradas
 output_dir = Path("/images/generated")
 output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -18,7 +18,7 @@ def generate_image():
     data = request.get_json()
     prompt = data.get("prompt", "A beautiful sunset")
     
-    # Gerar a imagem
+    # Gera a imagem com o prompt fornecido
     image = pipeline(prompt).images[0]
     output_path = output_dir / "output.png"
     image.save(output_path)
