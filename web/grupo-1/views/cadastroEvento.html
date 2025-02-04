@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="shortcut icon" href="img/logo.svg">
-    <link rel="stylesheet" type="text/css" href="css/estilocadastroEvento.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="./css/estilocadastroEvento.css" media="screen" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
@@ -54,15 +54,20 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="descricao" class="form-label">Descrição</label>
-                            <textarea class="form-control" id="descricaoInput" rows="3" placeholder="Digite a descrição do evento" style="border-radius:10px ;" required></textarea>
+                        <!--  -->
+                        <div>
+                            <label for="promptInput">Descrição:</label> <br>
+                            <input type="text" id="promptInput" class="form-control" placeholder="Descreva sua IMAGEM"> <br>
+                            <button onclick="generateImage()" class="btn btnCadastrarEvento" style="width: 100%;">Gerar imagem</button>
                         </div>
+                        <img id="generatedImage" src="" alt="Generated Image" style="max-width: 100%;">
+                        
+                        <!--  -->
                         <div class="mb-3 ">
                             <label for="url_banner" class="form-label">URL do Banner</label>
                             <div class="input-group flex-nowrap">
                                 <span class="input-group-text" id="iconeLink"><i class="bi bi-link-45deg "></i></span>
-                                <input type="text" class="form-control " id="urlLogoInput" placeholder="Digite a URL do logo " required>
+                                <input type="text" class="form-control " id="urlLogoInput" placeholder="Digite a URL do logo ">
                             </div>
                         </div>
                         <div class="mb-3 ">
@@ -136,18 +141,46 @@
 
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const organizadorInput = document.getElementById("organizador");
 
-            // Recupera o nome do usuário do Local Storage
-            const nomeUsuario = localStorage.getItem("nomeUsuario");
-            if (nomeUsuario) {
-                organizadorInput.value = nomeUsuario; // Preenche o campo organizador
-            } else {
-                alert("Você precisa estar logado para cadastrar um evento.");
-                window.location.href = "index.html"; // Redireciona para a página principal
-            }
+async function generateImage() {
+    const prompt = document.getElementById("promptInput").value;
+
+    try {
+        const response = await fetch("http://localhost:9001/generate-image", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ prompt })
         });
+
+        const data = await response.json();
+        if (data.path) {
+            document.getElementById("generatedImage").src = `http://localhost:9001/${data.path}`;
+            alert(data.message);
+        } else {
+            alert("Error generating image.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Failed to connect to the image generator API.");
+    }
+}
+
+
+
+        // document.addEventListener("DOMContentLoaded", () => {
+        //     const organizadorInput = document.getElementById("organizador");
+
+        //     // Recupera o nome do usuário do Local Storage
+        //     const nomeUsuario = localStorage.getItem("nomeUsuario");
+        //     if (nomeUsuario) {
+        //         organizadorInput.value = nomeUsuario; // Preenche o campo organizador
+        //     } else {
+        //         alert("Você precisa estar logado para cadastrar um evento.");
+        //         window.location.href = "index.html"; // Redireciona para a página principal
+        //     }
+        // });
 
         document.addEventListener('DOMContentLoaded', () => {
             const dataInicioInput = document.querySelector('#dataInicioInput');

@@ -1,0 +1,35 @@
+body {
+    background-color: #EDF2FA;
+    background-image: url("../img/logo.svg");
+    background-repeat: no-repeat;
+    background-position: 100px;
+    background-size: 500px;
+}
+
+.formulário {
+    background-color: white;
+    border-radius: 20px;
+}
+
+#iconeLink {}
+
+#iconeLink i {
+    color: #892CDC;
+}
+
+.btnCadastrarEvento {
+    background-color: #892CDC;
+    border-radius: 20px;
+    color: white;
+}
+
+.btnCadastrarEvento:hover {
+    background-color: white;
+    border-radius: 20px;
+    color: #892CDC;
+    border: #892CDC 2px solid;
+}
+
+.form-control {
+    border-radius: 2em;
+}

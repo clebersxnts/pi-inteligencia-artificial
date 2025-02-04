@@ -7,6 +7,8 @@ const path = __dirname + '/views/';
 
 const app = express()
 
+app.use(cors());
+
 router.use(function (req,res,next){
   console.log('/' + req.method);
   next();

@@ -2,12 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const uniqueValidator = require('mongoose-unique-validator');
-//const routes = require('./routes');
-const User = require('./models/User');
-
+const Usuario = require('./models/User'); 
 
 // Carregar variáveis de ambiente
 dotenv.config();
@@ -17,15 +15,25 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const port = 3001
-const uri = process.env.MONGODB_URL
-//const uri = 'mongodb://root:senha@mongo:27017/eventosgrupo1'
+// Configurações da aplicação
+const port = process.env.PORT || 3001;
+const mongoUrl = process.env.MONGODB_URL || 'mongodb://root:senha@mongo:27017/admin';
 
-// app.use('/api', routes);
-// app.use('/api/publico', rotasPublicas);
-// app.use('/api/protegido', autenticar, rotasProtegidas); 
-
-
+// Conectar ao MongoDB e iniciar o servidor
+mongoose
+    .connect(mongoUrl, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() => {
+        console.log('Conectado ao MongoDB com sucesso');
+        app.listen(port, () => {
+            console.log(`Servidor rodando na porta ${port}`);
+        });
+    })
+    .catch((err) => {
+        console.error('Erro ao conectar ao MongoDB:', err.message);
+    });
 
 // Definir Esquemas e Modelos do Mongoose
 const PointSchema = new mongoose.Schema({
@@ -40,39 +48,6 @@ const PointSchema = new mongoose.Schema({
     },
 });
 
-
-
-///////////////////// Rota de cadastro
-// router.post('/cadastro', async (req, res) => {
-//     const { nome, email, telefone, cpf, senha } = req.body;
-
-//     if (!nome || !email || !telefone || !cpf || !senha) {
-//         return res.status(400).json({ message: "Todos os campos são obrigatórios" });
-//     }
-
-//     try {
-//         const novoUsuario = new User({
-//             nome,
-//             email,
-//             telefone,
-//             cpf,
-//             senha // trocar para usar aquele jwt
-//         });
-
-//         await novoUsuario.save();
-
-//         res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
-//     } catch (err) {
-//         console.error("Erro ao cadastrar usuário:", err);
-//         res.status(500).json({ message: "Erro ao cadastrar usuário, tente novamente." });
-//     }
-// });
-
-// module.exports = router;
-
-/////////////////////////////
-
-
 const Categorias = new mongoose.Schema({ nome: String });
 
 const EventoBaseSchema = new mongoose.Schema({
@@ -82,7 +57,7 @@ const EventoBaseSchema = new mongoose.Schema({
 });
 const EventoBase = mongoose.model('EventoBase', EventoBaseSchema);
 
-const EventosCadastrados = mongoose.model('EventosCadastrados', mongoose.Schema({
+const EventosCadastrados = mongoose.model('EventosCadastrados', new mongoose.Schema({
     nomeEvento: String,
     dataInicio: String,
     horario: String,
@@ -99,7 +74,6 @@ const EventosCadastrados = mongoose.model('EventosCadastrados', mongoose.Schema(
     categorias: String,
     data_cadastro: String,
 }));
-
 
 const EventoSchema = new mongoose.Schema({
     nome: String,
@@ -120,35 +94,20 @@ const EventoSchema = new mongoose.Schema({
     data_cadastro: Date,
     categorias: [Categorias],
 });
-const Evento = mongoose.models.Evento || mongoose.model('Evento', EventoSchema); // evento sendo definido (erro q esta dando)
-/*
+const Evento = mongoose.model('Evento', EventoSchema);
+
 const usuarioSchema = new mongoose.Schema({
-    nome: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    nome: { type: String, required: true },
+    telefone: { type: String, required: true },
+    cpf: { type: String, required: true, unique: true },
     senha: { type: String, required: true },
 });
 usuarioSchema.plugin(uniqueValidator);
-const Usuario = mongoose.model('Usuario', usuarioSchema);
-*/
-// Conectar ao MongoDB antes de iniciar o servidor
-const connect = async() => {
-    mongoose.connect(uri).then(() => {
-    console.log(uri);
-    console.log('Conectado ao MongoDB com sucesso');
 
-    // Iniciar o servidor após a conexão com o MongoDB
-    app.listen(port, () => {
-        console.log(`Servidor rodando na porta ${port}`);
-    });
-}).catch(err => {
-    console.log(uri);
-    console.error('Erro ao conectar ao MongoDB:', err.message);
-});
-};
-
-connect();
-
+// Rotas
 // Rota para criar um novo evento base
-app.post("/eventos", async(req, res) => {
+app.post('/eventos', async (req, res) => {
     try {
         const { nome, descricao, organizador } = req.body;
         const eventoBase = new EventoBase({ nome, descricao, organizador });
@@ -160,8 +119,8 @@ app.post("/eventos", async(req, res) => {
 });
 
 // Rota para cadastro de evento
-app.post("/cadastro", async(req, res) => {
-    console.log("Requisição recebida para /cadastro");
+app.post('/cadastro', async (req, res) => {
+    console.log('Requisição recebida para /cadastro');
     try {
         const {
             nomeEvento,
@@ -178,217 +137,118 @@ app.post("/cadastro", async(req, res) => {
             estado,
             categorias,
             bairro,
-            data_cadastro
+            data_cadastro,
         } = req.body;
 
-        // Validação de campos obrigatórios
         if (!nomeEvento || !dataInicio || !preco || !descricao || !endereco || !cidade || !estado || !categorias) {
-            return res.status(400).send("Preencha todos os campos obrigatórios.");
+            return res.status(400).send('Preencha todos os campos obrigatórios.');
         }
 
-        // Criação de novo evento usando o modelo correto
         const novoEvento = new EventosCadastrados({
-            nomeEvento: nomeEvento,
-            dataInicio: dataInicio,
-            horario: horario,
-            preco: preco,
-            descricao: descricao,
-            urlLogo: urlLogo,
-            urlSite: urlSite,
-            cep: cep,
-            endereco: endereco,
-            numero: numero,
-            cidade: cidade,
-            estado: estado,
-            bairro: bairro,
-            categorias: categorias,
-            data_cadastro: data_cadastro
+            nomeEvento,
+            dataInicio,
+            horario,
+            preco,
+            descricao,
+            urlLogo,
+            urlSite,
+            cep,
+            endereco,
+            numero,
+            cidade,
+            estado,
+            bairro,
+            categorias,
+            data_cadastro,
         });
 
-        // Salvando evento no MongoDB
         await novoEvento.save();
 
-        // Buscando todos os eventos e retornando
         const eventos = await EventosCadastrados.find();
         res.json(eventos);
     } catch (error) {
-        console.error("Erro ao salvar o evento no MongoDB:", error);
-        res.status(500).send("Erro ao salvar ou buscar eventos.");
+        console.error('Erro ao salvar o evento no MongoDB:', error);
+        res.status(500).send('Erro ao salvar ou buscar eventos.');
     }
 });
 
 // Endpoint para alterar um evento
-app.put("/api/eventos/:id", async(req, res) => {
+app.put('/api/eventos/:id', async (req, res) => {
     try {
-        const {
-            nomeEvento,
-            dataInicio,
-            preco,
-            descricao,
-            urlLogo,
-            urlSite,
-            cep,
-            endereco,
-            numero,
-            bairro,
-            cidade,
-            estado,
-            categorias,
-        } = req.body;
-
-        // Atualização do evento existente
-        const eventoAtualizado = await EventosCadastrados.findByIdAndUpdate(req.params.id, {
-            nomeEvento,
-            dataInicio,
-            preco,
-            descricao,
-            urlLogo,
-            urlSite,
-            cep,
-            endereco,
-            numero,
-            bairro,
-            cidade,
-            estado,
-            categorias,
-        }, { new: true });
+        const eventoAtualizado = await EventosCadastrados.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        );
 
         if (!eventoAtualizado) {
-            return res.status(404).send("Evento não encontrado.");
+            return res.status(404).send('Evento não encontrado.');
         }
 
         res.status(200).json(eventoAtualizado);
     } catch (error) {
-        console.error("Erro ao alterar o evento:", error);
-        res.status(500).send("Erro ao alterar o evento.");
+        console.error('Erro ao alterar o evento:', error);
+        res.status(500).send('Erro ao alterar o evento.');
     }
 });
 
-
-
 // Endpoint para buscar um evento por ID
-app.get("/eventos/:id", async(req, res) => {
+app.get('/eventos/:id', async (req, res) => {
     try {
         const evento = await EventosCadastrados.findById(req.params.id);
         if (!evento) {
-            return res.status(404).send("Evento não encontrado.");
+            return res.status(404).send('Evento não encontrado.');
         }
         res.status(200).json(evento);
     } catch (error) {
-        res.status(500).send("Erro ao buscar o evento.");
-    }
-});
-
-// Endpoint para listar todos os eventos (nova rota)
-app.get('/api/eventos', async(req, res) => {
-    try {
-        const eventos = await EventosCadastrados.find();
-        res.json(eventos);
-    } catch (error) {
-        res.status(500).send('Erro ao buscar os eventos');
+        res.status(500).send('Erro ao buscar o evento.');
     }
 });
 
 // Endpoint para listar todos os eventos
-app.get("/eventos", async(req, res) => {
+app.get('/eventos', async (req, res) => {
     try {
         const eventos = await EventosCadastrados.find();
         res.status(200).json(eventos);
     } catch (error) {
-        res.status(500).send("Erro ao buscar eventos.");
+        res.status(500).send('Erro ao buscar eventos.');
     }
 });
-
-// Rota para buscar um evento específico por ID
-app.get('/api/eventos/:id', async(req, res) => {
-    try {
-        const evento = await EventosCadastrados.findById(req.params.id);
-        if (evento) {
-            res.json(evento);
-        } else {
-            res.status(404).send('Evento não encontrado');
-        }
-    } catch (error) {
-        res.status(500).send('Erro ao buscar o evento');
-    }
-});
-
-
-
-
-
 
 // Rota para cadastro de usuário (signup)
 app.post('/signup', async (req, res) => {
-    const { email, nome, telefone, cpf, senha } = req.body;
+    const { nome, email, telefone, cpf, senha } = req.body;
 
-    if (!email || !nome || !telefone || !cpf || !senha) {
-        return res.status(400).json({ message: "Todos os campos são obrigatórios" });
+    // Verifica campos obrigatórios
+    if (!nome || !email || !telefone || !cpf || !senha) {
+        return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
     }
 
     try {
+        // Cria um novo usuário
         const novoUsuario = new Usuario({
-            email,
             nome,
+            email,
             telefone,
             cpf,
-            senha: await bcrypt.hash(senha, 10), // Criptografando a senha
+            senha: await bcrypt.hash(senha, 10), // Criptografa a senha
         });
 
+        // Salva o usuário no banco de dados
         await novoUsuario.save();
-        console.log("Usuário criado:", novoUsuario);  // Adicionando um log para verificar os dados
 
-        res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
+        // Retorna sucesso
+        res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
     } catch (err) {
-        console.error("Erro ao cadastrar usuário:", err);
-        res.status(500).json({ message: "Erro ao cadastrar usuário, tente novamente." });
+        // Captura erros do Mongoose e do uniqueValidator
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Erro de validação', err: err.message });
+        }
+        if (err.code === 11000) { // Código de erro para campos únicos duplicados
+            return res.status(400).json({ message: 'Erro ao cadastrar usuário', err: 'Email ou CPF já cadastrado' });
+        }
+        // Erro genérico
+        console.error('Erro ao cadastrar usuário:', err);
+        res.status(500).json({ message: 'Erro ao cadastrar usuário, tente novamente.', err: err.message });
     }
 });
-
-
-// module.exports = router;
-
-
-// Rota para login de usuário
-app.post('/login', async (req, res) => {
-    const { email, senha } = req.body;
-    console.log('Corpo da requisição:', req.body); 
-    console.log('Email:', email);
-    console.log('Senha fornecida:', senha);
-
-    try {
-        // Usando o modelo correto "Usuario"
-        const user = await Usuario.findOne({ email });  
-        if (!user) {
-            return res.status(404).send('Usuário não encontrado');
-        }
-        
-        const senhaValida = await bcrypt.compare(senha, user.senha);  // Comparando senha fornecida com a senha armazenada
-        if (!senhaValida) {
-            return res.status(401).send('Senha inválida');
-        }
-        
-        res.status(200).send('Login bem-sucedido');
-    } catch (error) {
-        console.error('Erro ao realizar login:', error);
-        res.status(500).send('Erro interno do servidor');
-    }
-});
-
-
-function autenticar(req, res, next) {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    if (!token) {
-        return res.status(401).json({ message: 'Acesso não autorizado.' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'chave-secreta');
-        req.usuario = decoded; // Adiciona os dados do usuário decodificados ao objeto `req`
-        next();
-    } catch (error) {
-        res.status(401).json({ message: 'Token inválido.' });
-    }
-}
-
-module.exports = autenticar;

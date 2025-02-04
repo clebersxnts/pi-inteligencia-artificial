@@ -1,19 +1,20 @@
-FROM swaggerapi/swagger-ui:v5.9.1 AS swagger-ui
-FROM python:3.10
+FROM nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu20.04
 
-WORKDIR /images
+# Instalar dependências básicas
+RUN apt-get update && apt-get install -y python3 python3-pip git && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY . .
-COPY --from=swagger-ui /usr/share/nginx/html/swagger-ui.css swagger-ui-assets/swagger-ui.css
-COPY --from=swagger-ui /usr/share/nginx/html/swagger-ui-bundle.js swagger-ui-assets/swagger-ui-bundle.js
+# Definir diretório de trabalho
+WORKDIR /app
 
-COPY ./requirements.txt /images/requirements.txt
+# Copiar arquivos do projeto
+COPY . /app
 
-RUN pip install --no-cache-dir --upgrade -r /images/requirements.txt 
+# Instalar dependências do Python
+RUN pip3 install --upgrade pip && pip3 install -r requirements.txt
 
-RUN python3 -m pip install tf-nightly
-RUN python3 -m pip install keras
-
+# Expor a porta da API
 EXPOSE 9001
 
-CMD gunicorn --bind 0.0.0.0:9001 --workers 1 --timeout 0 webservice:app -k uvicorn.workers.UvicornWorker
+# Comando para rodar a aplicação
+CMD ["python3", "webservice.py"]
