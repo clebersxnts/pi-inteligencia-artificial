@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mongo:
     image: mongo
@@ -29,8 +27,8 @@ services:
 
   stable-diffusion-api:
     build:
-      context: ./api-ia/backend-files
-      dockerfile: images/Dockerfile
+      context: ./api-ia/backend-image
+      dockerfile: Dockerfile
     container_name: stable-diffusion-api
     ports:
       - "9001:9001"
@@ -38,8 +36,8 @@ services:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     volumes:
-      - ./api-ia/backend-files/images:/images
-      - ./api-ia/backend-files/images/webservice.py:/app/webservice.py
+      - ./api-ia/backend-image/images:/images
+      - ./api-ia/backend-image/webservice.py:/app/webservice.py
     deploy:
       resources:
         reservations:
@@ -60,19 +58,18 @@ services:
 
   grupo-1-api:
     build:
-      context: ./api-grupo-1
+      context: ./api/grupo-1
       dockerfile: Dockerfile
     container_name: grupo-1-api-container
     ports:
       - "3001:3001"
     volumes:
-      - ./api-grupo-1:/app
+      - ./api/grupo-1:/app
     environment:
       - MONGODB_URL=mongodb://root:senha@mongo:27017/admin
 
   whisper-webservice:
     image: 'onerahmet/openai-whisper-asr-webservice:latest'
-    container_name: whisper-webservice
     ports:
       - '9002:9000'
     environment:
