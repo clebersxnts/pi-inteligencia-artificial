@@ -11,7 +11,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: senha
       MONGO_INITDB_DATABASE: admin
-
   mongo-express:
     image: mongo-express
     restart: always
@@ -22,43 +21,43 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: senha
       ME_CONFIG_MONGODB_URL: mongodb://root:senha@mongo:27017/
       ME_CONFIG_BASICAUTH_ENABLED: false
+      ME_CONFIG_BASICAUTH_USERNAME:  root
+      ME_CONFIG_BASICAUTH_PASSWORD:  senha
       ME_CONFIG_MONGODB_ENABLE_ADMIN: true
       ME_CONFIG_MONGODB_SERVER: mongo
 
-stable-diffusion-api:
-  build:
-    context: ./api-ia/backend-image
-    dockerfile: Dockerfile
-  container_name: stable-diffusion-api
-  ports:
-    - "9001:9001"
-  environment:
-    - NVIDIA_VISIBLE_DEVICES=all
-    - NVIDIA_DRIVER_CAPABILITIES=compute,utility
-  volumes:
-    - ./api-ia/backend-image/images:/images
-  deploy:
-    resources:
-      reservations:
-        devices:
-          - driver: nvidia
-            count: 1
-            capabilities: [gpu]
+
+  stable-diffusion-api:
+    build:
+      context: ./api-ia/backend-image
+      dockerfile: Dockerfile
+    container_name: stable-diffusion-api
+    ports:
+      - "9001:9001"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    volumes:
+      - ./api-ia/backend-image/images:/images
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   grupo-1-service:
-    build:
-      context: ./web/grupo-1
-      dockerfile: Dockerfile
+    build: ./web/grupo-1
     container_name: grupo-1-container
     ports:
       - "8001:8081"
     volumes:
       - ./web/grupo-1:/app
 
+ 
   grupo-1-api:
-    build:
-      context: ./api/grupo-1
-      dockerfile: Dockerfile
+    build: ./api/grupo-1
     container_name: grupo-1-api-container
     ports:
       - "3001:3001"
@@ -67,10 +66,42 @@ stable-diffusion-api:
     environment:
       - MONGODB_URL=mongodb://root:senha@mongo:27017/admin
 
+  
+
+  backend-image:
+    build:
+      context: ./api-ia/backend-image
+      dockerfile: Dockerfile
+    ports:
+      - 9001:9001
+    develop:
+      watch:
+      - action: sync
+        path: ./api-ia/backend-image/images/webservice.py
+        target: images/webservice.py
+      - action: rebuild
+        path: ./api-ia/backend-image/requirements.txt
+    volumes:
+      - ./api-ia/backend-image/images:/images
+
+  backend-files:
+    build:
+      context: api-ia/backend-files
+      dockerfile: Dockerfile
+    ports:
+    - "9003:9001"
+    develop:
+      watch:
+      - action: sync
+        path: ./api-ia/backend-files/app/webservice.py
+        target: /app/webservice.py
+    volumes:
+      - /app
+
   whisper-webservice:
-    image: 'onerahmet/openai-whisper-asr-webservice:latest'
     ports:
       - '9002:9000'
     environment:
       - ASR_MODEL=base
       - ASR_ENGINE=openai_whisper
+    image: 'onerahmet/openai-whisper-asr-webservice:latest'

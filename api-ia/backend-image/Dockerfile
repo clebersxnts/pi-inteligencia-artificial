@@ -7,8 +7,8 @@ RUN apt-get update && apt-get install -y python3 python3-pip git && \
 # Definir diretório de trabalho
 WORKDIR /app
 
-# Copiar arquivos do projeto
-COPY . /app
+# Copiar todos os arquivos do projeto para o contêiner
+COPY . .
 
 # Instalar dependências do Python
 RUN pip3 install --upgrade pip && pip3 install -r requirements.txt
@@ -17,4 +17,4 @@ RUN pip3 install --upgrade pip && pip3 install -r requirements.txt
 EXPOSE 9001
 
 # Comando para rodar a aplicação
-CMD ["python3", "webservice.py"]
+CMD ["python3", "/app/webservice.py"]
