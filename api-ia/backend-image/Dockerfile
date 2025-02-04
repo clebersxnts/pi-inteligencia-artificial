@@ -1,26 +1,3 @@
-# Use uma imagem base com suporte a Python
-FROM python:3.10-slim
-
-# Defina o diretório de trabalho dentro do contêiner
-WORKDIR /app
-
-# Copie o arquivo requirements.txt para o contêiner
-
-# Instale as dependências listadas no requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copie o arquivo webservice.py para o contêiner
-
-
-# Copie o diretório 'images' para o contêiner
-
-
-# Exponha a porta que o serviço irá utilizar
-EXPOSE 9001
-
-# Comando para iniciar o serviço
-CMD ["python3", "/app/webservice.py"]
-
 FROM nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu20.04
 
 # Instalar dependências básicas

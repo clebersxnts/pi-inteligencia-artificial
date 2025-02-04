@@ -25,26 +25,25 @@ services:
       ME_CONFIG_MONGODB_ENABLE_ADMIN: true
       ME_CONFIG_MONGODB_SERVER: mongo
 
-  stable-diffusion-api:
-    build:
-      context: ./api-ia/backend-image
-      dockerfile: Dockerfile
-    container_name: stable-diffusion-api
-    ports:
-      - "9001:9001"
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
-    volumes:
-      - ./api-ia/backend-image/images:/images
-      - ./api-ia/backend-image/webservice.py:/app/webservice.py
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+stable-diffusion-api:
+  build:
+    context: ./api-ia/backend-image
+    dockerfile: Dockerfile
+  container_name: stable-diffusion-api
+  ports:
+    - "9001:9001"
+  environment:
+    - NVIDIA_VISIBLE_DEVICES=all
+    - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+  volumes:
+    - ./api-ia/backend-image/images:/images
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
 
   grupo-1-service:
     build:

@@ -26,4 +26,8 @@ def generate_image():
     return jsonify({"message": "Image generated successfully!", "path": str(output_path)})
 
 if __name__ == "__main__":
+    print("Iniciando o serviço Stable Diffusion API...")
+    print("Verificando se CUDA está disponível:", torch.cuda.is_available())
+    print("Usando dispositivo:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU")
     app.run(host="0.0.0.0", port=9001)
+
